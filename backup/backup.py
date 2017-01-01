@@ -1,6 +1,6 @@
 #######################################################
 # Python Project 1 - backup script
-# Updated: 04/04/2016
+# Updated: 02/01/2017
 # Created in order to assist with backing up files
 # Options:
 # 1. get list of files from source folder
@@ -102,81 +102,36 @@ class GlobalVar():
 class Application(Frame):
   def __init__(self, master):
     Frame.__init__(self, master)
-    self.pack(fill=BOTH, expand=1)
 
-    self.columnconfigure(0, pad=5, weight=1)
-    self.columnconfigure(1, pad=5, weight=3)
-    self.columnconfigure(2, pad=5, weight=1)
-    self.columnconfigure(3, pad=5, weight=1)
-    self.columnconfigure(4, pad=5, weight=1)
-    self.rowconfigure(0, pad=5, weight=1)
-    self.rowconfigure(1, pad=5, weight=1)
-    self.rowconfigure(2, pad=5, weight=1)
-    self.rowconfigure(3, pad=5, weight=1)
-    self.rowconfigure(4, pad=5, weight=1)
-    self.rowconfigure(5, pad=5, weight=1)
+    self.lbl = Label(master, text="Program to list, compare and copy files").grid(row=0, sticky='W', columnspan=4, padx=5, pady=5)
 
-    lbl = Label(self, text="Program to list, compare and copy files")
-    lbl.grid(row = 0, sticky=W, columnspan=4)
+    Label(master, text="Enter source folder path:").grid(row=1, sticky='W', padx=5, pady=5)
+    Label(master, text="Should be format C:...\...\...").grid(row=2, sticky='W', padx=5, pady=5)
+    self.src = Entry(master, width=40)
+    self.src.insert(0, r"C:\Users\Caz\Documents")
+    self.src.grid(row=1, column=1, columnspan=3, sticky='W', padx=5, pady=5)
 
-    self.b_exit = self.create_button("exit", 5, 3, "")
-    self.b_exit = self.set_button("exit")
-    self.create_labels("Enter source folder path:", 1, 0, "W")
-    self.create_labels("Should be format C:...\...\...", 2, 0, "W")
-    self.src = self.create_entry(50, 1, 1, 3, "W")
-    self.src.insert(INSERT, r"C:\Users\Caz\Documents" )
-    self.create_labels("Enter destination folder path:", 3, 0, "W")
-    self.dst = self.create_entry(50, 3, 1, 3, "W")
-    self.dst.insert(INSERT, r"G:\Caz_full_files\Caz\Documents" )
+    Label(master, text="Enter destination folder path:").grid(row=3, sticky='W', padx=5, pady=5)
+    self.dst = Entry(master, width=40)
+    self.dst.insert(0, r"G:\Caz_full_files\Caz\Documents")
+    self.dst.grid(row=3, column=1, columnspan=3, sticky='W', padx=5, pady=5)
 
-    self.lbl_warn = Label(self, text="")
-    self.lbl_warn.grid(row = 4, sticky=W, columnspan=5)
+    self.lbl_warn = Label(master, text="")
+    self.lbl_warn.grid(row=4, columnspan=5, sticky='W', padx=5, pady=5)
 
-    self.b_list = self.create_button("Print: List", 5, 0, "")
-    self.b_list = self.set_button("button_list")
-    self.b_compare = self.create_button("Print: Compare", 5, 1, "")
-    self.b_compare = self.set_button("button_compare")
-    self.b_copy = self.create_button("Print: Copy", 5, 2, "")
-    self.b_copy = self.set_button("button_copy")
-    self.b_src = self.create_button("..", 1, 4, "")
-    self.b_src = self.set_button("src directory")
-    self.b_dst = self.create_button("..", 3, 4, "")
-    self.b_dst = self.set_button("dst directory")
+    self.b_src = Button(master, text=" ... ", command=self.askdirectory_src).grid(row=1, column=4, padx=5, pady=5)
+    self.b_src = Button(master, text=" ... ", command=self.askdirectory_dst).grid(row=3, column=4, padx=5, pady=5)
+    self.b_list = Button(master, text="Print: List", command=self.button_list).grid(row=5, column=0, sticky='E', padx=5, pady=5)
+    self.b_compare = Button(master, text="Print: Compare", command=self.button_compare).grid(row=5, column=1, padx=5, pady=5)
+    self.b_copy = Button(master, text="Print: Copy", command=self.button_copy).grid(row=5, column=2, padx=5, pady=5)
+    self.b_exit = Button(master, text="Exit", command=self.quit).grid(row=5, column=3, padx=5, pady=5)
+
 
     # defining options for opening a directory
     self.dir_opt = options = {}
-    options['initialdir'] = 'C:\\'
-    options['mustexist'] = False
+    options['initialdir'] = r"C:\Users\Caz\Documents"
+    options['mustexist'] = True
     options['parent'] = root
-    options['title'] = 'This is a title'
-
-  def create_button(self, button_text, rowx, coly, stick):
-    self.button = Button(self, text = button_text)
-    self.button.grid(row = rowx, column = coly, sticky = stick, ipadx=10, padx=10)
-
-  def create_labels(self, display, rowx, coly, stick):
-    self.instruction = Label(self, text = display)
-    self.instruction.grid(row = rowx, column = coly, sticky = stick)
-
-  def create_entry(self, box_width, rowx, coly, colspan, stick):
-    self.input = Entry(self, width = box_width)
-    self.input.grid(row = rowx, column = coly, columnspan = colspan, sticky = stick)
-    return self.input
-
-
-  def set_button(self, button_type):
-    if button_type == "button_list":
-        self.button["command"] = self.button_list
-    if button_type == "button_compare":
-      self.button["command"] = self.button_compare
-    if button_type == "button_copy":
-      self.button["command"] = self.button_copy
-    if button_type == "exit":
-      self.button["command"] = self.quit
-    if button_type == "src directory":
-      self.button["command"] = self.askdirectory_src
-    if button_type == "dst directory":
-      self.button["command"] = self.askdirectory_dst
 
   def button_copy(self):
     copy_files()
