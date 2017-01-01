@@ -188,6 +188,7 @@ class Application(Frame):
   def button_list(self):
     global global_var
     global_var.set_old_folder(self.src.get())
+    global_var.set_new_folder(self.dst.get())
     list_files()
 
   def button_compare(self):
@@ -331,15 +332,43 @@ def close_logs(num_logs):
     target_log.close()
 
 
-# lists the files in the source directory
-def list_files():
-  global source_log, app, global_var
-
+# checks for errors in the source and target directories
+def dir_has_error():
+  global app, global_var
   # checks that the source folder exists
   if not os.path.exists(global_var.get_old_folder()):
     print ("Source folder '" + global_var.get_old_folder() + "' doesn't exist")
     sys.stdout.flush()
     app.update_label("WARNING: Source folder '" + global_var.get_old_folder() + "' doesn't exist")
+    return 1
+
+  if not os.path.exists(global_var.get_new_folder()):
+    print ("Destination folder '" + global_var.get_new_folder() + "' doesn't exist")
+    sys.stdout.flush()
+    app.update_label("WARNING: Destination folder '" + global_var.get_new_folder() + "' doesn't exist")
+    return 1
+
+  if global_var.get_new_folder() == "":
+    print ("Destination folder has not been completed")
+    sys.stdout.flush()
+    app.update_label("WARNING: Destination folder has not been completed")
+    return 1
+
+  if global_var.get_old_folder() == global_var.get_new_folder():
+    print ("The source and destination folders are the same")
+    sys.stdout.flush()
+    app.update_label("WARNING: Source and destination folders are the same")
+    return 1
+
+  return 0
+
+
+# lists the files in the source directory
+def list_files():
+  global source_log, app, global_var
+
+  # checks for errors in source and target directory chosen
+  if dir_has_error():
     return
 
   print_header("list")
@@ -377,23 +406,8 @@ def list_files():
 def compare_files():
   global source_log, global_var
 
-  # checks that the source folder exists
-  if not os.path.exists(global_var.get_old_folder()):
-    print ("Source folder '" + global_var.get_old_folder() + "' doesn't exist")
-    sys.stdout.flush()
-    app.update_label("WARNING: Source folder '" + global_var.get_old_folder() + "' doesn't exist")
-    return
-
-  if global_var.get_new_folder() == "":
-    print ("Destination folder has not been completed")
-    sys.stdout.flush()
-    app.update_label("WARNING: Destination folder has not been completed")
-    return
-
-  if global_var.get_old_folder() == global_var.get_new_folder():
-    print ("The source and destination folders are the same")
-    sys.stdout.flush()
-    app.update_label("WARNING: Source and destination folders are the same")
+  # checks for errors in source and target directory chosen
+  if dir_has_error():
     return
 
   print_header("comp")
@@ -464,22 +478,8 @@ def compare_files():
 def copy_files():
   global global_var, source_log, target_log
 
-  if not os.path.exists(global_var.get_old_folder()):
-    print ("Source folder '" + global_var.get_old_folder() + "' doesn't exist")
-    sys.stdout.flush()
-    app.update_label("WARNING: Source folder '" + global_var.get_old_folder() + "' doesn't exist")
-    return
-
-  if global_var.get_new_folder() == "":
-    print ("Destination folder has not been completed")
-    sys.stdout.flush()
-    app.update_label("WARNING: Destination folder has not been completed")
-    return
-
-  if global_var.get_old_folder() == global_var.get_new_folder():
-    print ("The source and destination folders are the same")
-    sys.stdout.flush()
-    app.update_label("WARNING: Source and destination folders are the same")
+  # checks for errors in source and target directory chosen
+  if dir_has_error():
     return
 
   print_header("copy")
