@@ -8,9 +8,7 @@
 #    flag those new/updated
 # 3. copy new/update files from source to destination
 # 
-# Since upgrading to Python 3, code needs to be revised
-# current issue: text doesn't immediately print to terminal
-# instead prints once program ends
+# Using Python 3
 # 
 #######################################################
 
@@ -124,9 +122,10 @@ class Application(Frame):
     self.create_labels("Enter source folder path:", 1, 0, "W")
     self.create_labels("Should be format C:...\...\...", 2, 0, "W")
     self.src = self.create_entry(50, 1, 1, 3, "W")
-    self.src.insert(INSERT, r"C:\somefolder" )
+    self.src.insert(INSERT, r"C:\Users\Caz\Documents" )
     self.create_labels("Enter destination folder path:", 3, 0, "W")
     self.dst = self.create_entry(50, 3, 1, 3, "W")
+    self.dst.insert(INSERT, r"G:\Caz_full_files\Caz\Documents" )
 
     self.lbl_warn = Label(self, text="")
     self.lbl_warn.grid(row = 4, sticky=W, columnspan=5)
@@ -217,7 +216,7 @@ def print_header(num_logs):
     print ("PROGRAM: LIST FILES IN SOURCE")
 
   if num_logs == "comp":
-    print ("PROGRAM: COMPARE SOURCE WITH DESTINGATION")
+    print ("PROGRAM: COMPARE SOURCE WITH DESTINATION")
 
   if num_logs == "copy":
     print ("PROGRAM: COPY FILES FROM SOURCE TO DESTINATION")
@@ -332,9 +331,10 @@ def list_files():
   for root, dirs, files in os.walk(global_var.get_old_folder()):
     for fname in files:
       
-      #old file path
+      # old file path
       old_full_path = os.path.join(root, fname)
 
+      # skips files with '$' in the name
       matchObj = re.match( r'.*\$.*', old_full_path, re.I)
       if matchObj:
         break
@@ -387,6 +387,7 @@ def compare_files():
       old_full_path = os.path.join(root, fname)
       new_full_path = os.path.join(str.replace(root,global_var.get_old_folder(),global_var.get_new_folder(), 1), fname)
 
+      # skips files with '$' in the name
       matchObj = re.match( r'.*\$.*', old_full_path, re.I)
       if matchObj:
         break
@@ -399,7 +400,7 @@ def compare_files():
       if not os.path.exists(new_full_path):
         global_var.add_num_copied()
         log_text += "* " + m_t_s + "\t" + old_full_path +"\n"
-        log_new_files += "* " + new_m_t_s + "\t" + old_full_path +"\n"
+        log_new_files += "* " + m_t_s + "\t" + old_full_path +"\n"
         print ("* " + old_full_path)
       
             # if the file already exists, checks
@@ -461,7 +462,8 @@ def copy_files():
       old_full_path = os.path.join(root, fname)
       new_full_path = os.path.join(str.replace(root,global_var.get_old_folder(),global_var.get_new_folder(), 1), fname)
 
-      matchObj = re.match( r'.*\$.*', old_full_path, re.I)
+      # skips files with '$' or '.ini' in the name
+      matchObj = re.match( r'.*(\$|\.ini).*', old_full_path, re.I)
       if matchObj:
         break
 
@@ -474,18 +476,21 @@ def copy_files():
       # > no? --> checks if directories exist
       #     > no? --> creates directories
       #   then copies the file
+
       if not os.path.exists(new_full_path):
         global_var.add_num_copied()
         if not os.path.exists(os.path.dirname(new_full_path)):
           os.makedirs(os.path.dirname(new_full_path))
+          
         shutil.copy2(old_full_path,new_full_path) # copy file and stats
         src_log_text += "* " + m_t_s + "\t" + old_full_path +"\n"
         dst_log_text += "* " + m_t_s + "\t" + new_full_path +"\n"
         print ("* " + old_full_path)
+        sys.stdout.flush()
       
-            # if the file already exists, checks
-            # if the source file is newer than the
-            # target file and if so, copies the file
+      # if the file already exists, checks
+      # if the source file is newer than the
+      # target file and if so, copies the file
       else:
         new_m_t, new_m_t_s = get_mod_time(new_full_path)
         if (m_t - new_m_t) >  1:
@@ -494,9 +499,11 @@ def copy_files():
           src_log_text += "* " + m_t_s + "\t" + old_full_path +"\n"
           dst_log_text += "* " + new_m_t_s + "\t" + new_full_path +"\n"
           print ("* " + old_full_path)
+          sys.stdout.flush()
         else:
           src_log_text += "- " + m_t_s + "\t" + old_full_path +"\n"
           print ("- " + old_full_path)
+          sys.stdout.flush()
 
   sys.stdout.flush()
   source_log.write(src_log_text)
