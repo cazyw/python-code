@@ -19,6 +19,7 @@ import shutil
 import time
 from datetime import date
 from tkinter import *
+from tkinter import filedialog
 
 
 # Class for the Global Variables
@@ -107,6 +108,7 @@ class Application(Frame):
     self.columnconfigure(1, pad=5, weight=3)
     self.columnconfigure(2, pad=5, weight=1)
     self.columnconfigure(3, pad=5, weight=1)
+    self.columnconfigure(4, pad=5, weight=1)
     self.rowconfigure(0, pad=5, weight=1)
     self.rowconfigure(1, pad=5, weight=1)
     self.rowconfigure(2, pad=5, weight=1)
@@ -136,8 +138,17 @@ class Application(Frame):
     self.b_compare = self.set_button("button_compare")
     self.b_copy = self.create_button("Print: Copy", 5, 2, "")
     self.b_copy = self.set_button("button_copy")
+    self.b_src = self.create_button("..", 1, 4, "")
+    self.b_src = self.set_button("src directory")
+    self.b_dst = self.create_button("..", 3, 4, "")
+    self.b_dst = self.set_button("dst directory")
 
-
+    # defining options for opening a directory
+    self.dir_opt = options = {}
+    options['initialdir'] = 'C:\\'
+    options['mustexist'] = False
+    options['parent'] = root
+    options['title'] = 'This is a title'
 
   def create_button(self, button_text, rowx, coly, stick):
     self.button = Button(self, text = button_text)
@@ -162,6 +173,10 @@ class Application(Frame):
       self.button["command"] = self.button_copy
     if button_type == "exit":
       self.button["command"] = self.quit
+    if button_type == "src directory":
+      self.button["command"] = self.askdirectory_src
+    if button_type == "dst directory":
+      self.button["command"] = self.askdirectory_dst
 
   def button_copy(self):
     copy_files()
@@ -189,6 +204,14 @@ class Application(Frame):
 
   def update_label(self, update_text):
     self.lbl_warn["text"] = update_text
+
+  def askdirectory_src(self):
+    self.src.delete(0, END)
+    self.src.insert(0, filedialog.askdirectory(**self.dir_opt).replace("/","\\"))
+
+  def askdirectory_dst(self):
+    self.dst.delete(0, END)
+    self.dst.insert(0, filedialog.askdirectory(**self.dir_opt).replace("/","\\"))
 
 
 
@@ -367,6 +390,11 @@ def compare_files():
     app.update_label("WARNING: Destination folder has not been completed")
     return
 
+  if global_var.get_old_folder() == global_var.get_new_folder():
+    print ("The source and destination folders are the same")
+    sys.stdout.flush()
+    app.update_label("WARNING: Source and destination folders are the same")
+    return
 
   print_header("comp")
   open_logs("comp")
@@ -446,6 +474,12 @@ def copy_files():
     print ("Destination folder has not been completed")
     sys.stdout.flush()
     app.update_label("WARNING: Destination folder has not been completed")
+    return
+
+  if global_var.get_old_folder() == global_var.get_new_folder():
+    print ("The source and destination folders are the same")
+    sys.stdout.flush()
+    app.update_label("WARNING: Source and destination folders are the same")
     return
 
   print_header("copy")
