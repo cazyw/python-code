@@ -4,11 +4,13 @@ A simple application for comparing and backing up files
 
 <img src="https://cazyw.github.io/img/backup-0.jpg" width="450">
 
+It's been a while, still works (on my Windows 10 machine), but it's time to review the code.
+
 ## Environment and System Configuration
 
 Built in Windows 7 with Python 3. Only tested in a windows environment. There may be issues in other environments due to the '/' and '\\' difference between Windows and Unix based systems.
 
-Python can be downloaded from https://www.python.org/
+Python 3 can be downloaded from https://www.python.org/
 The GUI was built using the Tkinter package which is included in the Windows python download.
 
 ## Application Installation Instructions
